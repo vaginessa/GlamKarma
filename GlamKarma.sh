@@ -60,9 +60,27 @@ enable_karma=1
 karma_black_white=1
 " >> hostapd.conf
 
-xterm -geometry 75x15+1+0 -T "./hostapd -dd hostapd.conf" & karmapid=$!
+xterm -geometry 75x15+1+0 -T "./hostapd -dd hostapd.conf | egrep Karam " & karmapid=$!
 
 echo "starting dhcp3-server"
+
+touch $mydir/dhcpdkarma.conf
+
+echo "authoritative;
+
+default-lease-time 600;
+max-lease-time 7200;
+
+subnet 10.0.0.0 netmask 255.255.255.0 {
+option routers 10.0.0.1;
+option subnet-mask 255.255.255.0;
+
+option domain-name "\"$ESSID\"";
+option domain-name-servers 10.0.0.1;
+
+range 10.0.0.20 10.0.0.50;
+
+}" >> $mydir/dhcpdkarma.conf
 
 xterm -geometry 75x15+1+0 -T "dhcp3-server -f -cf dhcpdkarma.conf" & dhcp3pid=$!
 
